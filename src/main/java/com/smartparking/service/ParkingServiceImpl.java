@@ -1,0 +1,179 @@
+package com.smartparking.service;
+
+import com.smartparking.config.TarifConfig;
+import com.smartparking.dto.request.ParkingKeluarRequest;
+import com.smartparking.dto.request.ParkingMasukRequest;
+import com.smartparking.dto.response.DashboardResponse;
+import com.smartparking.dto.response.KendaraanAktifResponse;
+import com.smartparking.dto.response.RiwayatResponse;
+import com.smartparking.dto.response.StrukResponse;
+import com.smartparking.model.domain.Kendaraan;
+import com.smartparking.model.domain.Mobil;
+import com.smartparking.model.domain.Motor;
+import com.smartparking.model.entity.KendaraanAktif;
+import com.smartparking.model.entity.RiwayatParkir;
+import com.smartparking.repository.KendaraanAktifRepository;
+import com.smartparking.repository.RiwayatParkirRepository;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class ParkingServiceImpl implements ParkingService {
+
+    private final KendaraanAktifRepository aktifRepo;
+    private final RiwayatParkirRepository riwayatRepo;
+
+    // Inject via constructor (tanpa Lombok)
+    public ParkingServiceImpl(KendaraanAktifRepository aktifRepo, RiwayatParkirRepository riwayatRepo) {
+        this.aktifRepo = aktifRepo;
+        this.riwayatRepo = riwayatRepo;
+    }
+
+    // Factory method: buat Motor/Mobil berdasarkan jenis
+    private Kendaraan createKendaraan(String jenis, String plat, LocalDateTime masuk) {
+        if ("Motor".equalsIgnoreCase(jenis)) {
+            return new Motor(plat, masuk);
+        } else if ("Mobil".equalsIgnoreCase(jenis)) {
+            return new Mobil(plat, masuk);
+        } else {
+            throw new IllegalArgumentException("Jenis tidak valid");
+        }
+    }
+
+    @Override
+    public DashboardResponse getDashboard() {
+        List<KendaraanAktif> listAll = aktifRepo.findAll();
+        int motor = 0;
+        int mobil = 0;
+        List<KendaraanAktifResponse> listResponse = new ArrayList<>();
+
+        for (KendaraanAktif k : listAll) {
+            if ("Motor".equalsIgnoreCase(k.getJenis())) motor++;
+            if ("Mobil".equalsIgnoreCase(k.getJenis())) mobil++;
+
+            KendaraanAktifResponse resp = new KendaraanAktifResponse();
+            resp.setId(k.getId());
+            resp.setPlatNomor(k.getPlatNomor());
+            resp.setJenis(k.getJenis());
+            resp.setWaktuMasuk(k.getWaktuMasuk().toString());
+            resp.setDurasiMenit(k.getDurasiMenit());
+            listResponse.add(resp);
+        }
+
+        DashboardResponse dash = new DashboardResponse();
+        dash.setKendaraanAktif(listAll.size());
+        dash.setJumlahMobil(mobil);
+        dash.setJumlahMotor(motor);
+        dash.setKapasitasTersedia(TarifConfig.KAPASITAS_TOTAL - listAll.size());
+        dash.setListAktif(listResponse);
+        return dash;
+    }
+
+    @Override
+    public KendaraanAktifResponse parkingMasuk(ParkingMasukRequest req) {
+        if (aktifRepo.existsByPlatNomor(req.getPlatNomor())) {
+            throw new IllegalArgumentException("Kendaraan dengan plat " + req.getPlatNomor() + " sudah ada di dalam.");
+        }
+        if (aktifRepo.count() >= TarifConfig.KAPASITAS_TOTAL) {
+            throw new RuntimeException("Kapasitas parkir penuh");
+        }
+
+        KendaraanAktif k = new KendaraanAktif(req.getPlatNomor(), req.getJenis(), LocalDateTime.now());
+        k = aktifRepo.save(k);
+
+        KendaraanAktifResponse resp = new KendaraanAktifResponse();
+        resp.setId(k.getId());
+        resp.setPlatNomor(k.getPlatNomor());
+        resp.setJenis(k.getJenis());
+        resp.setWaktuMasuk(k.getWaktuMasuk().toString());
+        resp.setDurasiMenit(0);
+        return resp;
+    }
+
+    @Override
+    public List<KendaraanAktifResponse> getKendaraanAktif() {
+        return aktifRepo.findAll().stream().map(k -> {
+            KendaraanAktifResponse resp = new KendaraanAktifResponse();
+            resp.setId(k.getId());
+            resp.setPlatNomor(k.getPlatNomor());
+            resp.setJenis(k.getJenis());
+            resp.setWaktuMasuk(k.getWaktuMasuk().toString());
+            resp.setDurasiMenit(k.getDurasiMenit());
+            return resp;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public StrukResponse parkingKeluar(ParkingKeluarRequest req) {
+        KendaraanAktif data = aktifRepo.findById(req.getId())
+                .orElseThrow(() -> new RuntimeException("Kendaraan tidak ditemukan"));
+
+        Kendaraan k = createKendaraan(data.getJenis(), data.getPlatNomor(), data.getWaktuMasuk());
+        LocalDateTime keluar = LocalDateTime.now();
+        int durasi = k.hitungDurasiMenit(keluar); 
+        int lamaJam = k.hitungLamaJam(durasi);      
+        int total = k.hitungTarif(durasi);         
+
+        RiwayatParkir r = new RiwayatParkir();
+        r.setPlatNomor(data.getPlatNomor());
+        r.setJenis(data.getJenis());
+        r.setWaktuMasuk(data.getWaktuMasuk());
+        r.setWaktuKeluar(keluar);
+        r.setDurasiMenit(durasi);
+        r.setTarifPerJam(k.getTarifPerJam());
+        r.setLamaJam(lamaJam);
+        r.setTotalBayar(total);
+        riwayatRepo.save(r);
+        aktifRepo.deleteById(req.getId());
+
+        StrukResponse struk = new StrukResponse();
+        struk.setPlatNomor(data.getPlatNomor());
+        struk.setJenis(data.getJenis());
+        struk.setWaktuMasuk(data.getWaktuMasuk().toString());
+        struk.setWaktuKeluar(keluar.toString());
+        struk.setDurasiMenit(durasi);
+        struk.setTarifPerJam(k.getTarifPerJam());
+        struk.setLamaJam(lamaJam);
+        struk.setTotalBayar(total);
+        return struk;
+    }
+
+    @Override
+    public RiwayatResponse getRiwayat(String tanggal, String jenis, String platNomor) {
+        // Simplified for this implementation without complex criteria builder
+        List<RiwayatParkir> all = riwayatRepo.findAll();
+        
+        long totalTransaksi = all.size();
+        long totalPendapatan = all.stream().mapToInt(RiwayatParkir::getTotalBayar).sum();
+        double rataRata = totalTransaksi > 0 ? (double) totalPendapatan / totalTransaksi : 0;
+
+        RiwayatResponse resp = new RiwayatResponse();
+        resp.setTotalTransaksi(totalTransaksi);
+        resp.setTotalPendapatan(totalPendapatan);
+        resp.setRataRata(rataRata);
+        resp.setTransaksi(all);
+        resp.setChart7Hari(new ArrayList<>());
+        return resp;
+    }
+
+    @Override
+    public byte[] exportCsv() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("ID,Plat Nomor,Jenis,Masuk,Keluar,Durasi (Menit),Lama (Jam),Total Bayar\n");
+        for (RiwayatParkir r : riwayatRepo.findAll()) {
+            sb.append(r.getId()).append(",")
+              .append(r.getPlatNomor()).append(",")
+              .append(r.getJenis()).append(",")
+              .append(r.getWaktuMasuk()).append(",")
+              .append(r.getWaktuKeluar()).append(",")
+              .append(r.getDurasiMenit()).append(",")
+              .append(r.getLamaJam()).append(",")
+              .append(r.getTotalBayar()).append("\n");
+        }
+        return sb.toString().getBytes();
+    }
+}
