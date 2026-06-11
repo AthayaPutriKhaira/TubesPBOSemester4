@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-import BottomBar from '../components/BottomBar';
+
 import VehicleBadge from '../components/VehicleBadge';
 import { parkingApi } from '../api/parking';
 import type { RiwayatResponse } from '../types/parking';
 import { formatRupiah, formatDurasi, formatWaktu } from '../utils/format';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChartSimple, faTriangleExclamation, faPrint, faArrowsRotate, faCircleInfo, faCircleCheck, faBolt, faFileArrowDown, faCaretDown, faMoneyBill, faCalculator, faFileLines } from '@fortawesome/free-solid-svg-icons';
 
 const History: React.FC = () => {
   const [data, setData] = useState<RiwayatResponse | null>(null);
@@ -54,7 +56,7 @@ const History: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 border border-red-200">
-            ⚠️ {error}
+            <FontAwesomeIcon icon={faTriangleExclamation} /> {error}
           </div>
         )}
 
@@ -65,7 +67,7 @@ const History: React.FC = () => {
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-gray-500 font-medium">Total Transaksi</h3>
-                  <span className="text-2xl text-blue-500">📄</span>
+                  <span className="text-2xl text-blue-500"><FontAwesomeIcon icon={faFileLines} /></span>
                 </div>
                 <div className="text-3xl font-bold text-gray-800 mb-1">{data.totalTransaksi}</div>
                 <div className="text-sm text-gray-400">{data.totalTransaksi} data sesuai filter</div>
@@ -73,7 +75,7 @@ const History: React.FC = () => {
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-gray-500 font-medium">Total Pendapatan</h3>
-                  <span className="text-2xl text-green-500">💵</span>
+                  <span className="text-2xl text-green-500"><FontAwesomeIcon icon={faMoneyBill} /></span>
                 </div>
                 <div className="text-3xl font-bold text-gray-800 mb-1">{formatRupiah(data.totalPendapatan)}</div>
                 <div className="text-sm text-gray-400">Semua waktu</div>
@@ -81,7 +83,7 @@ const History: React.FC = () => {
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-gray-500 font-medium">Rata-rata per Transaksi</h3>
-                  <span className="text-2xl text-purple-500">🧮</span>
+                  <span className="text-2xl text-purple-500"><FontAwesomeIcon icon={faCalculator} /></span>
                 </div>
                 <div className="text-3xl font-bold text-gray-800 mb-1">{formatRupiah(data.rataRata)}</div>
                 <div className="text-sm text-gray-400">Rata-rata biaya parkir</div>
@@ -92,7 +94,7 @@ const History: React.FC = () => {
               <div className="xl:col-span-3 space-y-6">
                 {/* Filter Card */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                  <h3 className="font-bold text-gray-800 mb-4">🔽 Filter Data</h3>
+                  <h3 className="font-bold text-gray-800 mb-4"><FontAwesomeIcon icon={faCaretDown} /> Filter Data</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <input
                       type="date"
@@ -122,7 +124,7 @@ const History: React.FC = () => {
                       🔍 Terapkan Filter
                     </button>
                     <button onClick={handleResetFilter} className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                      🔄 Reset
+                      <FontAwesomeIcon icon={faArrowsRotate} /> Reset
                     </button>
                   </div>
                 </div>
@@ -130,15 +132,15 @@ const History: React.FC = () => {
                 {/* Chart Card */}
                 {data.chart7Hari && data.chart7Hari.length > 0 && (
                   <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-                    <h3 className="font-bold text-gray-800 mb-6">📊 Transaksi 7 Hari Terakhir</h3>
+                    <h3 className="font-bold text-gray-800 mb-6"><FontAwesomeIcon icon={faChartSimple} /> Transaksi 7 Hari Terakhir</h3>
                     <div className="h-64 w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={data.chart7Hari}>
                           <XAxis dataKey="tanggal" fontSize={12} tickMargin={10} />
                           <YAxis fontSize={12} />
                           <Tooltip 
-                            formatter={(value: number, name: string) => [
-                              name === 'pendapatan' ? formatRupiah(value) : value, 
+                            formatter={(value: any, name: any) => [
+                              name === 'pendapatan' ? formatRupiah(Number(value)) : value, 
                               name === 'pendapatan' ? 'Pendapatan' : 'Jumlah'
                             ]}
                           />
@@ -190,29 +192,29 @@ const History: React.FC = () => {
               <div className="xl:col-span-1 space-y-6">
                 <div className="bg-yellow-50 rounded-xl p-5 border border-yellow-200">
                   <h3 className="font-bold text-yellow-800 mb-3 flex items-center gap-2">
-                    <span>ℹ️</span> Informasi Riwayat
+                    <span><FontAwesomeIcon icon={faCircleInfo} /></span> Informasi Riwayat
                   </h3>
                   <ul className="space-y-2 text-sm text-yellow-700">
-                    <li className="flex items-start gap-2"><span>✅</span> <span>Semua transaksi parkir yang selesai akan tercatat di sini</span></li>
-                    <li className="flex items-start gap-2"><span>✅</span> <span>Gunakan filter untuk mencari data spesifik</span></li>
-                    <li className="flex items-start gap-2"><span>✅</span> <span>Chart menampilkan aktivitas 7 hari terakhir</span></li>
+                    <li className="flex items-start gap-2"><span><FontAwesomeIcon icon={faCircleCheck} /></span> <span>Semua transaksi parkir yang selesai akan tercatat di sini</span></li>
+                    <li className="flex items-start gap-2"><span><FontAwesomeIcon icon={faCircleCheck} /></span> <span>Gunakan filter untuk mencari data spesifik</span></li>
+                    <li className="flex items-start gap-2"><span><FontAwesomeIcon icon={faCircleCheck} /></span> <span>Chart menampilkan aktivitas 7 hari terakhir</span></li>
                     <li className="flex items-start gap-2 text-gray-500 font-medium mt-3 border-t border-yellow-200/50 pt-2">
-                      <span>⬇️</span> <span>Data dapat diekspor ke CSV</span>
+                      <span><FontAwesomeIcon icon={faFileArrowDown} /></span> <span>Data dapat diekspor ke CSV</span>
                     </li>
                   </ul>
                 </div>
                 
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                    <div className="p-4 border-b border-gray-100 bg-gray-50">
-                      <h3 className="font-bold text-gray-800 flex items-center gap-2"><span>⚡</span> Aksi Cepat</h3>
+                      <h3 className="font-bold text-gray-800 flex items-center gap-2"><span><FontAwesomeIcon icon={faBolt} /></span> Aksi Cepat</h3>
                    </div>
                    <div className="p-2 space-y-1">
                      <a href={parkingApi.exportCsvUrl} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg text-gray-700 font-medium w-full text-left transition-colors">
-                        <span className="w-8 h-8 rounded bg-green-100 flex items-center justify-center text-green-600 text-lg">⬇️</span>
+                        <span className="w-8 h-8 rounded bg-green-100 flex items-center justify-center text-green-600 text-lg"><FontAwesomeIcon icon={faFileArrowDown} /></span>
                         Export CSV
                      </a>
                      <button onClick={() => window.print()} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg text-gray-700 font-medium w-full text-left transition-colors">
-                        <span className="w-8 h-8 rounded bg-blue-100 flex items-center justify-center text-blue-600 text-lg">🖨️</span>
+                        <span className="w-8 h-8 rounded bg-blue-100 flex items-center justify-center text-blue-600 text-lg"><FontAwesomeIcon icon={faPrint} /></span>
                         Print Data
                      </button>
                    </div>

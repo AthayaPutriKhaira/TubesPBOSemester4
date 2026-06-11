@@ -15,7 +15,6 @@ public abstract class Kendaraan {
         this.waktuMasuk = waktuMasuk;
     }
 
-    // Abstract methods — wajib di-override oleh subclass
     public abstract int hitungTarif(int durasiMenit);
     public abstract String getJenis();
     public abstract int getTarifPerJam();
@@ -29,7 +28,7 @@ public abstract class Kendaraan {
         return (int) Math.ceil(durasiMenit / 60.0);
     }
 
-    // Getter & Setter manual (tanpa Lombok)
+    // Getter & Setter 
     public String getPlatNomor() {
         return platNomor;
     }

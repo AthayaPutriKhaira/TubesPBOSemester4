@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import BottomBar from '../components/BottomBar';
+
 import { parkingApi } from '../api/parking';
 import type { JenisKendaraan } from '../types/parking';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCarSide, faMotorcycle, faChartSimple, faTriangleExclamation, faArrowsRotate, faCircleInfo, faCircleCheck, faBolt, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
 
 const ParkingIn: React.FC = () => {
   const navigate = useNavigate();
@@ -50,7 +52,7 @@ const ParkingIn: React.FC = () => {
       {successToast && (
         <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
           <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
-            <span className="text-xl">✅</span>
+            <span className="text-xl"><FontAwesomeIcon icon={faCircleCheck} /></span>
             <span className="font-medium">Kendaraan berhasil masuk!</span>
           </div>
         </div>
@@ -63,7 +65,7 @@ const ParkingIn: React.FC = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6">
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <span>🚗</span> Form Input Kendaraan
+                  <span><FontAwesomeIcon icon={faCarSide} /></span> Form Input Kendaraan
                 </h2>
                 <p className="text-orange-100 mt-1 text-sm">Isi data kendaraan dengan lengkap</p>
               </div>
@@ -71,16 +73,16 @@ const ParkingIn: React.FC = () => {
               <form onSubmit={handleSubmit} className="p-6">
                 {error && (
                   <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 border border-red-200 text-sm flex items-start gap-2">
-                    <span className="mt-0.5">⚠️</span> 
+                    <span className="mt-0.5"><FontAwesomeIcon icon={faTriangleExclamation} /></span> 
                     <span>{error}</span>
                   </div>
                 )}
 
                 <div className="mb-6">
-                  <label className="block text-brand-orange font-bold mb-2">🚗 Plat Nomor Kendaraan *</label>
+                  <label className="block text-brand-orange font-bold mb-2"><FontAwesomeIcon icon={faCarSide} /> Plat Nomor Kendaraan *</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-gray-400">🚗</span>
+                      <span className="text-gray-400"><FontAwesomeIcon icon={faCarSide} /></span>
                     </div>
                     <input
                       type="text"
@@ -94,7 +96,7 @@ const ParkingIn: React.FC = () => {
                 </div>
 
                 <div className="mb-8">
-                  <label className="block text-brand-orange font-bold mb-3">🚗 Jenis Kendaraan *</label>
+                  <label className="block text-brand-orange font-bold mb-3"><FontAwesomeIcon icon={faCarSide} /> Jenis Kendaraan *</label>
                   <div className="grid grid-cols-2 gap-4">
                     <div 
                       onClick={() => setJenis('Motor')}
@@ -104,7 +106,7 @@ const ParkingIn: React.FC = () => {
                           : 'border-gray-200 hover:border-green-300'
                       }`}
                     >
-                      <div className="text-4xl mb-2">🛵</div>
+                      <div className="text-4xl mb-2"><FontAwesomeIcon icon={faMotorcycle} /></div>
                       <div className={`font-bold text-lg ${jenis === 'Motor' ? 'text-green-700' : 'text-gray-700'}`}>Motor</div>
                       <div className="text-xs text-gray-500 mt-1 hidden sm:block">Sepeda motor, skuter, dll</div>
                     </div>
@@ -117,7 +119,7 @@ const ParkingIn: React.FC = () => {
                           : 'border-gray-200 hover:border-blue-300'
                       }`}
                     >
-                      <div className="text-4xl mb-2">🚗</div>
+                      <div className="text-4xl mb-2"><FontAwesomeIcon icon={faCarSide} /></div>
                       <div className={`font-bold text-lg ${jenis === 'Mobil' ? 'text-blue-700' : 'text-gray-700'}`}>Mobil</div>
                       <div className="text-xs text-gray-500 mt-1 hidden sm:block">Mobil penumpang, SUV, MPV</div>
                     </div>
@@ -133,7 +135,7 @@ const ParkingIn: React.FC = () => {
                     {loading ? (
                       <><span className="animate-spin inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full"></span> Loading...</>
                     ) : (
-                      <><span>💾</span> Simpan Data Masuk</>
+                      <><span><FontAwesomeIcon icon={faFloppyDisk} /></span> Simpan Data Masuk</>
                     )}
                   </button>
                   <button
@@ -142,7 +144,7 @@ const ParkingIn: React.FC = () => {
                     disabled={loading}
                     className="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
-                    <span>🔄</span> <span className="hidden sm:inline">Reset Form</span>
+                    <span><FontAwesomeIcon icon={faArrowsRotate} /></span> <span className="hidden sm:inline">Reset Form</span>
                   </button>
                 </div>
               </form>
@@ -153,25 +155,25 @@ const ParkingIn: React.FC = () => {
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-yellow-50 rounded-xl p-5 border border-yellow-200">
               <h3 className="font-bold text-yellow-800 mb-3 flex items-center gap-2">
-                <span>ℹ️</span> Informasi Parkir Masuk
+                <span><FontAwesomeIcon icon={faCircleInfo} /></span> Informasi Parkir Masuk
               </h3>
               <ul className="space-y-2 text-sm text-yellow-700">
-                <li className="flex items-start gap-2"><span>✅</span> <span>Pastikan plat nomor terbaca dengan jelas</span></li>
-                <li className="flex items-start gap-2"><span>✅</span> <span>Pilih jenis kendaraan sesuai kategori</span></li>
-                <li className="flex items-start gap-2"><span>✅</span> <span>Waktu masuk akan tercatat otomatis</span></li>
+                <li className="flex items-start gap-2"><span><FontAwesomeIcon icon={faCircleCheck} /></span> <span>Pastikan plat nomor terbaca dengan jelas</span></li>
+                <li className="flex items-start gap-2"><span><FontAwesomeIcon icon={faCircleCheck} /></span> <span>Pilih jenis kendaraan sesuai kategori</span></li>
+                <li className="flex items-start gap-2"><span><FontAwesomeIcon icon={faCircleCheck} /></span> <span>Waktu masuk akan tercatat otomatis</span></li>
                 <li className="flex items-start gap-2 text-red-600 font-medium mt-3 border-t border-yellow-200/50 pt-2">
-                  <span>⚠️</span> <span>Kendaraan yang belum keluar tidak bisa masuk lagi</span>
+                  <span><FontAwesomeIcon icon={faTriangleExclamation} /></span> <span>Kendaraan yang belum keluar tidak bisa masuk lagi</span>
                 </li>
               </ul>
             </div>
             
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                <div className="p-4 border-b border-gray-100 bg-gray-50">
-                  <h3 className="font-bold text-gray-800 flex items-center gap-2"><span>⚡</span> Aksi Cepat</h3>
+                  <h3 className="font-bold text-gray-800 flex items-center gap-2"><span><FontAwesomeIcon icon={faBolt} /></span> Aksi Cepat</h3>
                </div>
                <div className="p-2">
                  <Link to="/" className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg text-gray-700 font-medium">
-                    <span className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center text-xl">📊</span>
+                    <span className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center text-xl"><FontAwesomeIcon icon={faChartSimple} /></span>
                     Lihat Dashboard
                  </Link>
                </div>

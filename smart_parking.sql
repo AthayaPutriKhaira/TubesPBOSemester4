@@ -29,3 +29,17 @@ CREATE TABLE IF NOT EXISTS riwayat_parkir (
     lama_jam INT NOT NULL,
     total_bayar INT NOT NULL
 ) ENGINE=InnoDB;
+
+-- Tabel users (untuk login admin dan petugas)
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL COMMENT 'ADMIN atau PETUGAS',
+    nama VARCHAR(100) NOT NULL
+) ENGINE=InnoDB;
+
+-- Default users (akan otomatis dibuat oleh DataSeeder saat aplikasi pertama kali dijalankan)
+INSERT IGNORE INTO users (username, password, role, nama) VALUES
+('admin', 'admin123', 'ADMIN', 'Administrator'),
+('petugas', 'petugas123', 'PETUGAS', 'Petugas Parkir');

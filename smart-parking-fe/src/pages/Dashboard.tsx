@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import BottomBar from '../components/BottomBar';
+
 import StatCard from '../components/StatCard';
 import VehicleBadge from '../components/VehicleBadge';
 import { parkingApi } from '../api/parking';
 import type { DashboardData } from '../types/parking';
 import { formatDurasi, formatWaktu } from '../utils/format';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCarSide, faMotorcycle, faSquareParking, faCar, faArrowRightFromBracket, faArrowRightToBracket, faStopwatch, faTriangleExclamation, faArrowsRotate, faBolt } from '@fortawesome/free-solid-svg-icons';
 
 const Dashboard: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -51,7 +53,7 @@ const Dashboard: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 border border-red-200">
-            ⚠️ {error}
+            <FontAwesomeIcon icon={faTriangleExclamation} /> {error}
           </div>
         )}
 
@@ -62,26 +64,26 @@ const Dashboard: React.FC = () => {
               <StatCard 
                 label="Kendaraan Aktif" 
                 value={data.kendaraanAktif} 
-                icon="🚗" 
+                icon={<FontAwesomeIcon icon={faCarSide} />} 
                 subLabel={`${((data.kendaraanAktif / 100) * 100).toFixed(0)}% terisi`}
                 progress={(data.kendaraanAktif / 100) * 100}
               />
               <StatCard 
                 label="Mobil" 
                 value={data.jumlahMobil} 
-                icon="🚙" 
+                icon={<FontAwesomeIcon icon={faCar} />} 
                 subLabel={`${data.kendaraanAktif > 0 ? ((data.jumlahMobil / data.kendaraanAktif) * 100).toFixed(0) : 0}% dari total`}
               />
               <StatCard 
                 label="Motor" 
                 value={data.jumlahMotor} 
-                icon="🛵" 
+                icon={<FontAwesomeIcon icon={faMotorcycle} />} 
                 subLabel={`${data.kendaraanAktif > 0 ? ((data.jumlahMotor / data.kendaraanAktif) * 100).toFixed(0) : 0}% dari total`}
               />
               <StatCard 
                 label="Kapasitas Tersedia" 
                 value={data.kapasitasTersedia} 
-                icon="🅿️" 
+                icon={<FontAwesomeIcon icon={faSquareParking} />} 
                 subLabel="Dari 100 slot total"
               />
             </div>
@@ -93,7 +95,7 @@ const Dashboard: React.FC = () => {
                   <div className="p-5 border-b border-gray-100 flex justify-between items-center">
                     <div>
                       <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <span>🚗</span> Kendaraan Aktif di Area Parkir
+                        <span><FontAwesomeIcon icon={faCarSide} /></span> Kendaraan Aktif di Area Parkir
                       </h2>
                       <p className="text-sm text-gray-500 mt-1">Kendaraan yang belum melakukan checkout</p>
                     </div>
@@ -121,7 +123,7 @@ const Dashboard: React.FC = () => {
                             </td>
                           </tr>
                         ) : (
-                          data.listAktif.map((item) => (
+                          data.listAktif.slice(0, 5).map((item) => (
                             <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                               <td className="px-5 py-4 font-bold text-gray-900">{item.platNomor}</td>
                               <td className="px-5 py-4"><VehicleBadge jenis={item.jenis} /></td>
@@ -130,7 +132,7 @@ const Dashboard: React.FC = () => {
                                 <div className="text-xs text-gray-500">{formatWaktu(item.waktuMasuk).split(' ')[0]}</div>
                               </td>
                               <td className="px-5 py-4 text-gray-700">
-                                <span className="inline-block mr-1">⏱</span> {formatDurasi(item.durasiMenit)}
+                                <span className="inline-block mr-1"><FontAwesomeIcon icon={faStopwatch} /></span> {formatDurasi(item.durasiMenit)}
                               </td>
                               <td className="px-5 py-4">
                                 <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-600">
@@ -144,8 +146,13 @@ const Dashboard: React.FC = () => {
                     </table>
                   </div>
                   
-                  <div className="p-4 bg-gray-50 border-t border-gray-100 text-xs text-gray-500 italic flex items-center gap-1.5">
-                    <span>🔄</span> Durasi diperbarui otomatis setiap 30 detik (Update terakhir: {formatWaktu(lastUpdate.toISOString()).split(' ')[1]})
+                  <div className="p-4 bg-gray-50 border-t border-gray-100 text-xs text-gray-500 flex justify-between items-center">
+                    <span className="italic"><FontAwesomeIcon icon={faArrowsRotate} /> Update terakhir: {formatWaktu(lastUpdate.toISOString()).split(' ')[1]}</span>
+                    {data.listAktif.length > 5 && (
+                      <Link to="/aktif" className="text-brand-orange font-medium hover:text-orange-600 flex items-center gap-1 transition-colors">
+                        Lihat Semua ({data.listAktif.length}) <span className="text-lg leading-none">›</span>
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
@@ -155,14 +162,14 @@ const Dashboard: React.FC = () => {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                   <div className="p-5 border-b border-gray-100">
                     <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                      <span>⚡</span> Aksi Cepat
+                      <span><FontAwesomeIcon icon={faBolt} /></span> Aksi Cepat
                     </h2>
                   </div>
                   
                   <div className="divide-y divide-gray-100">
                     <Link to="/masuk" className="flex items-center p-5 hover:bg-green-50 transition-colors group">
                       <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-green-600 text-xl mr-4 group-hover:bg-green-200 transition-colors">
-                        📥
+                        <FontAwesomeIcon icon={faArrowRightToBracket} />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-bold text-gray-900">Parkir Masuk</h3>
@@ -173,7 +180,7 @@ const Dashboard: React.FC = () => {
                     
                     <Link to="/keluar" className="flex items-center p-5 hover:bg-red-50 transition-colors group">
                       <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center text-red-600 text-xl mr-4 group-hover:bg-red-200 transition-colors">
-                        📤
+                        <FontAwesomeIcon icon={faArrowRightFromBracket} />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-bold text-gray-900">Parkir Keluar</h3>
@@ -184,7 +191,7 @@ const Dashboard: React.FC = () => {
 
                     <Link to="/riwayat" className="flex items-center p-5 hover:bg-gray-50 transition-colors group">
                       <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 text-xl mr-4 group-hover:bg-gray-200 transition-colors">
-                        🔄
+                        <FontAwesomeIcon icon={faArrowsRotate} />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-bold text-gray-900">Riwayat Parkir</h3>

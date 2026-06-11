@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+
 import Navbar from '../components/Navbar';
-import BottomBar from '../components/BottomBar';
+
 import ConfirmModal from '../components/ConfirmModal';
 import { parkingApi } from '../api/parking';
 import type { KendaraanAktif, StrukData } from '../types/parking';
 import { hitungEstimasi, formatRupiah, formatDurasi, formatWaktu } from '../utils/format';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCarSide, faMotorcycle, faClipboardList, faTriangleExclamation, faCheck, faPrint, faArrowsRotate, faCircleInfo, faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 
 const ParkingOut: React.FC = () => {
   const [kendaraanList, setKendaraanList] = useState<KendaraanAktif[]>([]);
   const [selectedId, setSelectedId] = useState<number | ''>('');
-  const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState('');
   
   const [showModal, setShowModal] = useState(false);
@@ -50,7 +52,7 @@ const ParkingOut: React.FC = () => {
   const handleConfirm = async () => {
     if (!selectedId) return;
     
-    setLoading(true);
+
     try {
       const res = await parkingApi.postKeluar({ id: Number(selectedId) });
       setStruk(res.data);
@@ -59,7 +61,7 @@ const ParkingOut: React.FC = () => {
       setError(err.response?.data?.message || 'Gagal memproses parkir keluar');
       setShowModal(false);
     } finally {
-      setLoading(false);
+
     }
   };
 
@@ -99,19 +101,19 @@ Total Bayar: ${formatRupiah(struk.totalBayar)}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="bg-gradient-to-r from-red-500 to-red-600 p-6">
                   <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <span>🚗</span> Pilih Kendaraan Keluar
+                    <span><FontAwesomeIcon icon={faCarSide} /></span> Pilih Kendaraan Keluar
                   </h2>
                 </div>
 
                 <div className="p-6">
                   {error && (
                     <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 border border-red-200 text-sm">
-                      ⚠️ {error}
+                      <FontAwesomeIcon icon={faTriangleExclamation} /> {error}
                     </div>
                   )}
 
                   <div className="mb-6">
-                    <label className="block text-brand-red font-bold mb-2">🚗 Plat Nomor Kendaraan *</label>
+                    <label className="block text-brand-red font-bold mb-2"><FontAwesomeIcon icon={faCarSide} /> Plat Nomor Kendaraan *</label>
                     <select
                       value={selectedId}
                       onChange={(e) => setSelectedId(e.target.value === '' ? '' : Number(e.target.value))}
@@ -150,7 +152,7 @@ Total Bayar: ${formatRupiah(struk.totalBayar)}
                           </div>
                         </div>
                         <div className="mt-4 pt-3 border-t border-yellow-200/50 text-xs text-gray-500 flex items-center gap-1.5">
-                          <span>ℹ️</span> Perhitungan berdasarkan durasi parkir dan tarif per jam
+                          <span><FontAwesomeIcon icon={faCircleInfo} /></span> Perhitungan berdasarkan durasi parkir dan tarif per jam
                         </div>
                       </div>
                     </div>
@@ -177,7 +179,7 @@ Total Bayar: ${formatRupiah(struk.totalBayar)}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-300">
                 <div className="p-8 max-w-sm mx-auto">
                   <div className="text-center mb-6">
-                    <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl">✓</div>
+                    <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl"><FontAwesomeIcon icon={faCheck} /></div>
                     <h2 className="text-xl font-bold text-gray-900">Transaksi Berhasil</h2>
                     <p className="text-sm text-gray-500">Bukti pembayaran parkir</p>
                   </div>
@@ -212,13 +214,13 @@ Total Bayar: ${formatRupiah(struk.totalBayar)}
 
                   <div className="flex flex-col gap-3">
                     <button onClick={() => window.print()} className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex items-center justify-center gap-2">
-                      <span>🖨️</span> Cetak Struk
+                      <span><FontAwesomeIcon icon={faPrint} /></span> Cetak Struk
                     </button>
                     <button onClick={handleCopy} className="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 flex items-center justify-center gap-2">
-                      <span>📋</span> Salin Struk
+                      <span><FontAwesomeIcon icon={faClipboardList} /></span> Salin Struk
                     </button>
                     <button onClick={handleReset} className="w-full py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 flex items-center justify-center gap-2">
-                      <span>🔄</span> Transaksi Baru
+                      <span><FontAwesomeIcon icon={faArrowsRotate} /></span> Transaksi Baru
                     </button>
                   </div>
                 </div>
@@ -230,13 +232,13 @@ Total Bayar: ${formatRupiah(struk.totalBayar)}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-yellow-50 rounded-xl p-5 border border-yellow-200">
               <h3 className="font-bold text-yellow-800 mb-3 flex items-center gap-2">
-                <span>ℹ️</span> Informasi Parkir Keluar
+                <span><FontAwesomeIcon icon={faCircleInfo} /></span> Informasi Parkir Keluar
               </h3>
               <ul className="space-y-2 text-sm text-yellow-700">
-                <li className="flex items-start gap-2"><span>✅</span> <span>Pastikan plat nomor sesuai dengan fisik kendaraan</span></li>
-                <li className="flex items-start gap-2"><span>✅</span> <span>Tarif dihitung otomatis berdasarkan waktu masuk</span></li>
-                <li className="flex items-start gap-2"><span>✅</span> <span>Pembayaran dapat dilakukan setelah struk keluar</span></li>
-                <li className="flex items-start gap-2"><span>✅</span> <span>Data transaksi akan tersimpan di riwayat</span></li>
+                <li className="flex items-start gap-2"><span><FontAwesomeIcon icon={faCircleCheck} /></span> <span>Pastikan plat nomor sesuai dengan fisik kendaraan</span></li>
+                <li className="flex items-start gap-2"><span><FontAwesomeIcon icon={faCircleCheck} /></span> <span>Tarif dihitung otomatis berdasarkan waktu masuk</span></li>
+                <li className="flex items-start gap-2"><span><FontAwesomeIcon icon={faCircleCheck} /></span> <span>Pembayaran dapat dilakukan setelah struk keluar</span></li>
+                <li className="flex items-start gap-2"><span><FontAwesomeIcon icon={faCircleCheck} /></span> <span>Data transaksi akan tersimpan di riwayat</span></li>
               </ul>
             </div>
             
@@ -246,11 +248,11 @@ Total Bayar: ${formatRupiah(struk.totalBayar)}
                </div>
                <div className="p-4 space-y-3">
                  <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                   <div className="flex items-center gap-2 text-gray-700 font-medium"><span>🛵</span> Motor</div>
+                   <div className="flex items-center gap-2 text-gray-700 font-medium"><span><FontAwesomeIcon icon={faMotorcycle} /></span> Motor</div>
                    <div className="font-bold text-gray-900">Rp 2.000<span className="text-xs text-gray-500 font-normal">/jam</span></div>
                  </div>
                  <div className="flex justify-between items-center">
-                   <div className="flex items-center gap-2 text-gray-700 font-medium"><span>🚗</span> Mobil</div>
+                   <div className="flex items-center gap-2 text-gray-700 font-medium"><span><FontAwesomeIcon icon={faCarSide} /></span> Mobil</div>
                    <div className="font-bold text-gray-900">Rp 5.000<span className="text-xs text-gray-500 font-normal">/jam</span></div>
                  </div>
                </div>
