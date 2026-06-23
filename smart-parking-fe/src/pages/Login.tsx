@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 import { Car, ShieldCheck, UserCog, Eye, EyeOff, AlertTriangle, Loader2 } from "lucide-react";
+import LoginTurntable3D from "../components/LoginTurntable3D";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -81,8 +82,8 @@ export default function LoginPage() {
 
         {/* Left Side */}
         <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-10 flex flex-col justify-center items-center">
-          <div className="bg-white/20 p-6 rounded-full mb-6">
-            <Car size={70} />
+          <div className="relative hidden md:block overflow-hidden w-full h-80">
+            <LoginTurntable3D />
           </div>
 
           <h1 className="text-4xl font-bold mb-3">
