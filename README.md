@@ -63,15 +63,11 @@ Akses aplikasi di: `http://localhost:5173`
 
 | Username | Password | Keterangan |
 |----------|----------|------------|
-| `user1` | `password123` | Akun utama |
-| `testuser` | *(gunakan Register)* | Akun tes tambahan |
+| `admin` | `admin123` | Akun Admin (contoh) |
+| `petugas` | `petugas123` | Akun Petugas (contoh) |
 
-> Sistem autentikasi menggunakan JWT token untuk keamanan session.
+> Sistem autentikasi saat ini menggunakan endpoint Login dasar. Akun-akun awal biasanya dibuat melalui `DataSeeder` saat backend pertama kali dijalankan.
 
-Untuk membuat akun baru, gunakan halaman **Login** dengan opsi registrasi, kemudian isi:
-- Username
-- Password
-- Email (opsional)
 
 ---
 
@@ -131,7 +127,7 @@ TubesPBOSemester4/
 
 ### Modul 3 — Enkapsulasi
 - **`Kendaraan` entity**: Private fields dengan getter/setter
-- **`Parkir` entity**: Private fields untuk data parkir dengan aksesor yang terkontrol
+- **`KendaraanAktif` & `RiwayatParkir` entity**: Private fields untuk data parkir dengan aksesor yang terkontrol
 - **`User` entity**: Password dan data sensitif dienkapsulasi
 
 ### Modul 6 — Interface & Polimorfisme
@@ -140,14 +136,12 @@ TubesPBOSemester4/
 - **`KapasitasService` interface**: Contract untuk manajemen kapasitas
 
 ### Modul 7 — Lambda & Stream API
-- **`ParkingController.getHistory()`**: Menggunakan Stream API untuk filter dan mapping data
-- **`KapasitasController`**: Stream untuk agregasi data kapasitas
-- **DTO mapping**: Lambda expressions di service layer untuk transformasi entity ke DTO
+- **`ParkingServiceImpl.getRiwayat()`**: Menggunakan Stream API untuk memfilter dan memetakan data riwayat parkir.
+- **DTO mapping**: Lambda expressions (`.map()`) di service layer untuk transformasi entity ke DTO.
 
 ### Modul 9 — Exception Handling
 - **`GlobalExceptionHandler`**: Centralized exception handling dengan `@ControllerAdvice`
-- **Custom exceptions**: `ParkingException`, `KapasitasException`
-- **Try-catch-finally**: Di method `calculateTariff()`, `processParkingOut()`
+- **Standard Exceptions**: Melempar `IllegalArgumentException` dan `RuntimeException` pada kondisi tidak valid.
 
 ### Modul 10 — Polymorphism
 - Multiple implementations dari service interfaces
@@ -212,20 +206,23 @@ Buka browser dan kunjungi: `http://localhost:5173`
 
 ### Authentication
 - `POST /api/auth/login` - Login user
-- `POST /api/auth/register` - Register user baru
 
 ### Parking Operations
-- `GET /api/parking` - Get semua parkir records
-- `POST /api/parking/in` - Pencatatan parkir masuk
-- `POST /api/parking/out` - Pencatatan parkir keluar
+- `GET /api/dashboard` - Get data ringkasan dashboard (kapasitas & kendaraan aktif)
+- `GET /api/parking/aktif` - Get semua data kendaraan yang sedang parkir
+- `POST /api/parking/masuk` - Pencatatan parkir masuk
+- `POST /api/parking/keluar` - Pencatatan parkir keluar
 
 ### Capacity Management
-- `GET /api/kapasitas` - Get kapasitas current
-- `PUT /api/kapasitas` - Update kapasitas maksimal
+- `GET /api/kapasitas` - Get semua data kapasitas area
+- `POST /api/kapasitas` - Tambah area kapasitas baru
+- `PUT /api/kapasitas/{id}` - Update kapasitas
+- `DELETE /api/kapasitas/{id}` - Hapus kapasitas
 
 ### Reports
-- `GET /api/reports/financial` - Laporan keuangan
-- `GET /api/reports/history` - Riwayat lengkap
+- `GET /api/riwayat` - Riwayat lengkap transaksi parkir
+- `GET /api/riwayat/export-csv` - Export data riwayat ke format CSV
+- `DELETE /api/riwayat/{id}` - Hapus data riwayat tertentu (Hanya Admin)
 
 ---
 
