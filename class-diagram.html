@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Diagram - Smart Parking</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { color: #888; margin-bottom: 25px; font-size: 14px; }
+        .btn-group { display: flex; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
+        button {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .btn-download {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .btn-svg {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+        }
+        .btn-svg:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(56, 239, 125, 0.4); }
+        .btn-zoom {
+            background: rgba(255,255,255,0.1);
+            color: #ccc;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .btn-zoom:hover { background: rgba(255,255,255,0.2); }
+        #diagram-container {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 100%;
+            overflow: auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .loading {
+            color: #888;
+            font-size: 16px;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📐 Class Diagram — Smart Parking</h1>
+    <p class="subtitle">Diagram ini sesuai 100% dengan kode proyek</p>
+
+    <div class="btn-group">
+        <button class="btn-download" onclick="downloadPNG()">📥 Download PNG</button>
+        <button class="btn-svg" onclick="downloadSVG()">📥 Download SVG</button>
+        <button class="btn-zoom" onclick="zoomIn()">🔍 Zoom +</button>
+        <button class="btn-zoom" onclick="zoomOut()">🔍 Zoom −</button>
+        <button class="btn-zoom" onclick="resetZoom()">↻ Reset</button>
+    </div>
+
+    <div id="diagram-container">
+        <div class="loading">⏳ Memuat diagram...</div>
+        <pre class="mermaid" id="mermaid-diagram">
+classDiagram
+    direction TB
+
+    class Kendaraan {
+        &lt;&lt;abstract&gt;&gt;
+        - platNomor: String
+        - waktuMasuk: LocalDateTime
+        + Kendaraan(platNomor, waktuMasuk)
+        + hitungTarif(durasiMenit: int) int*
+        + getJenis() String*
+        + getTarifPerJam() int*
+        + hitungDurasiMenit(waktuKeluar: LocalDateTime) int
+        + hitungLamaJam(durasiMenit: int) int
+        + getPlatNomor() String
+        + setPlatNomor(platNomor: String) void
+        + getWaktuMasuk() LocalDateTime
+        + setWaktuMasuk(waktuMasuk: LocalDateTime) void
+    }
+
+    class Mobil {
+        + Mobil(platNomor, waktuMasuk)
+        + hitungTarif(durasiMenit: int) int
+        + getJenis() String
+        + getTarifPerJam() int
+    }
+
+    class Motor {
+        + Motor(platNomor, waktuMasuk)
+        + hitungTarif(durasiMenit: int) int
+        + getJenis() String
+        + getTarifPerJam() int
+    }
+
+    Kendaraan <|-- Mobil : extends
+    Kendaraan <|-- Motor : extends
+
+    class KendaraanAktif {
+        &lt;&lt;Entity&gt;&gt;
+        - id: Long
+        - platNomor: String
+        - jenis: String
+        - waktuMasuk: LocalDateTime
+        + KendaraanAktif()
+        + KendaraanAktif(platNomor, jenis, waktuMasuk)
+        + getDurasiMenit() long
+    }
+
+    class RiwayatParkir {
+        &lt;&lt;Entity&gt;&gt;
+        - id: Long
+        - platNomor: String
+        - jenis: String
+        - waktuMasuk: LocalDateTime
+        - waktuKeluar: LocalDateTime
+        - durasiMenit: int
+        - tarifPerJam: int
+        - lamaJam: int
+        - totalBayar: int
+        - createdAt: LocalDateTime
+        + RiwayatParkir()
+    }
+
+    class User {
+        &lt;&lt;Entity&gt;&gt;
+        - id: Long
+        - username: String
+        - password: String
+        - role: String
+        - nama: String
+        + User()
+        + User(username, password, role, nama)
+    }
+
+    class Kapasitas {
+        &lt;&lt;Entity&gt;&gt;
+        - id: Long
+        - namaArea: String
+        - jumlahKapasitas: int
+        + Kapasitas()
+        + Kapasitas(namaArea, jumlahKapasitas)
+    }
+
+    class TarifConfig {
+        + TARIF_MOTOR: int = 2000$
+        + TARIF_MOBIL: int = 5000$
+        + KAPASITAS_TOTAL: int = 100$
+    }
+
+    class ParkingService {
+        &lt;&lt;interface&gt;&gt;
+        + getDashboard() DashboardResponse
+        + parkingMasuk(req) KendaraanAktifResponse
+        + getKendaraanAktif() List
+        + parkingKeluar(req) StrukResponse
+        + getRiwayat(tanggal, jenis, platNomor) RiwayatResponse
+        + exportCsv() byte[]
+        + deleteRiwayat(id, role) void
+    }
+
+    class ParkingServiceImpl {
+        - aktifRepo: KendaraanAktifRepository
+        - riwayatRepo: RiwayatParkirRepository
+        - kapasitasRepo: KapasitasRepository
+        - createKendaraan(jenis, plat, masuk) Kendaraan
+        + getDashboard() DashboardResponse
+        + parkingMasuk(req) KendaraanAktifResponse
+        + parkingKeluar(req) StrukResponse
+        + getRiwayat(tanggal, jenis, platNomor) RiwayatResponse
+        + exportCsv() byte[]
+        + deleteRiwayat(id, role) void
+    }
+
+    class AuthService {
+        &lt;&lt;interface&gt;&gt;
+        + login(request) LoginResponse
+    }
+
+    class AuthServiceImpl {
+        - userRepository: UserRepository
+        + login(request) LoginResponse
+    }
+
+    class KapasitasService {
+        &lt;&lt;interface&gt;&gt;
+        + getAllKapasitas() List
+        + createKapasitas(request) KapasitasResponse
+        + updateKapasitas(id, request) KapasitasResponse
+        + deleteKapasitas(id) void
+        + getTotalKapasitas() Integer
+    }
+
+    class KapasitasServiceImpl {
+        - kapasitasRepository: KapasitasRepository
+        + getAllKapasitas() List
+        + createKapasitas(request) KapasitasResponse
+        + updateKapasitas(id, request) KapasitasResponse
+        + deleteKapasitas(id) void
+        + getTotalKapasitas() Integer
+    }
+
+    ParkingService <|.. ParkingServiceImpl : implements
+    AuthService <|.. AuthServiceImpl : implements
+    KapasitasService <|.. KapasitasServiceImpl : implements
+
+    class KendaraanAktifRepository {
+        &lt;&lt;interface&gt;&gt;
+        + findByPlatNomor(platNomor) Optional
+        + existsByPlatNomor(platNomor) boolean
+    }
+
+    class RiwayatParkirRepository {
+        &lt;&lt;interface&gt;&gt;
+    }
+
+    class KapasitasRepository {
+        &lt;&lt;interface&gt;&gt;
+        + getTotalKapasitas() Integer
+    }
+
+    class UserRepository {
+        &lt;&lt;interface&gt;&gt;
+        + findByUsername(username) Optional
+        + existsByUsername(username) boolean
+    }
+
+    class ParkingController {
+        - parkingService: ParkingService
+        + getDashboard() ResponseEntity
+        + parkingMasuk(req) ResponseEntity
+        + getKendaraanAktif() ResponseEntity
+        + parkingKeluar(req) ResponseEntity
+        + getRiwayat(tanggal, jenis, platNomor) ResponseEntity
+        + exportCsv() ResponseEntity
+        + deleteRiwayat(id, role) ResponseEntity
+    }
+
+    class AuthController {
+        - authService: AuthService
+        + login(request) ResponseEntity
+    }
+
+    class KapasitasController {
+        - kapasitasService: KapasitasService
+        + getAllKapasitas() ResponseEntity
+        + createKapasitas(request) ResponseEntity
+        + updateKapasitas(id, request) ResponseEntity
+        + deleteKapasitas(id) ResponseEntity
+    }
+
+    ParkingController --> ParkingService : uses
+    AuthController --> AuthService : uses
+    KapasitasController --> KapasitasService : uses
+
+    ParkingServiceImpl --> KendaraanAktifRepository : uses
+    ParkingServiceImpl --> RiwayatParkirRepository : uses
+    ParkingServiceImpl --> KapasitasRepository : uses
+    ParkingServiceImpl --> Kendaraan : creates
+
+    AuthServiceImpl --> UserRepository : uses
+    KapasitasServiceImpl --> KapasitasRepository : uses
+
+    KendaraanAktifRepository ..> KendaraanAktif : manages
+    RiwayatParkirRepository ..> RiwayatParkir : manages
+    KapasitasRepository ..> Kapasitas : manages
+    UserRepository ..> User : manages
+
+    Mobil --> TarifConfig : reads tarif
+    Motor --> TarifConfig : reads tarif
+        </pre>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        let currentZoom = 1;
+        const container = document.getElementById('diagram-container');
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            themeVariables: {
+                fontSize: '14px'
+            }
+        });
+
+        mermaid.run().then(() => {
+            const loading = container.querySelector('.loading');
+            if (loading) loading.remove();
+        });
+
+        function getSVGElement() {
+            return container.querySelector('svg');
+        }
+
+        function downloadPNG() {
+            const svg = getSVGElement();
+            if (!svg) { alert('Diagram belum dimuat!'); return; }
+
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            const scaleFactor = 3;
+
+            img.onload = function() {
+                canvas.width = img.width * scaleFactor;
+                canvas.height = img.height * scaleFactor;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.scale(scaleFactor, scaleFactor);
+                ctx.drawImage(img, 0, 0);
+
+                const link = document.createElement('a');
+                link.download = 'class_diagram_smart_parking.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+        }
+
+        function downloadSVG() {
+            const svg = getSVGElement();
+            if (!svg) { alert('Diagram belum dimuat!'); return; }
+
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const link = document.createElement('a');
+            link.download = 'class_diagram_smart_parking.svg';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        }
+
+        function zoomIn() {
+            currentZoom += 0.2;
+            applyZoom();
+        }
+
+        function zoomOut() {
+            currentZoom = Math.max(0.3, currentZoom - 0.2);
+            applyZoom();
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            applyZoom();
+        }
+
+        function applyZoom() {
+            const svg = getSVGElement();
+            if (svg) {
+                svg.style.transform = `scale(${currentZoom})`;
+                svg.style.transformOrigin = 'top left';
+            }
+        }
+    </script>
+</body>
+</html>
